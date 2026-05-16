@@ -1,0 +1,27 @@
+# =========================================================================
+# NtUserTransformPoint — example probe template
+# Tests parameter validation in coordinate transformation syscall
+# =========================================================================
+name: "NtUserTransformPoint parameter validation example"
+syscall: 0x15AD
+platform: "Win11 24H2"
+description: >
+  Example probe demonstrating boundary value testing for a syscall
+  that performs coordinate transformation. Tests null pointer and
+  boundary parameter handling.
+
+params:
+  - name: param_1
+    type: LPPOINT
+    value: "0"
+    strategy: [NullPage, GuardPage, InvalidAlignment]
+
+  - name: param_2
+    type: UINT
+    value: 0
+    strategy: [BoundaryMin, BoundaryMax]
+
+expect:
+  - unexpected_status
+  - status_invalid_parameter
+

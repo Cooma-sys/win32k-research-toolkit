@@ -1,0 +1,48 @@
+# =========================================================================
+# NtGdiExtTextOutW truncation — example probe template
+# Tests size truncation scenarios in text output syscall
+# =========================================================================
+name: "NtGdiExtTextOutW size truncation example"
+syscall: 0x1324
+platform: "Win11 24H2"
+description: >
+  Example probe demonstrating size truncation boundary testing.
+  Tests signed/unsigned and truncation scenarios on size parameters.
+
+params:
+  - name: hdc
+    type: HDC
+    value: valid_dc
+
+  - name: x
+    type: INT
+    value: 0
+
+  - name: y
+    type: INT
+    value: 0
+
+  - name: fuOptions
+    type: UINT
+    value: 0
+
+  - name: lprc
+    type: LPRECT
+    value: "0"
+
+  - name: lpString
+    type: LPWSTR
+    value: valid_buffer_256
+
+  - name: cbCount
+    type: INT
+    strategy: [SignedUnsigned, Truncation32to16, IntegerOverflow]
+
+  - name: lpDx
+    type: LPINT
+    value: "0"
+
+expect:
+  - unexpected_status
+  - status_invalid_parameter
+

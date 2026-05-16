@@ -1,0 +1,49 @@
+# =========================================================================
+# NtGdiExtTextOutW — example probe template
+# Tests integer boundary handling in text output syscall
+# =========================================================================
+name: "NtGdiExtTextOutW count boundary example"
+syscall: 0x1324
+platform: "Win11 24H2"
+description: >
+  Example probe demonstrating boundary value testing for a GDI text
+  output syscall. Tests integer boundary conditions on the character
+  count parameter.
+
+params:
+  - name: hdc
+    type: HDC
+    value: valid_dc
+
+  - name: x
+    type: INT
+    value: 0
+
+  - name: y
+    type: INT
+    value: 0
+
+  - name: fuOptions
+    type: UINT
+    value: 0
+
+  - name: lprc
+    type: LPRECT
+    value: "0"
+
+  - name: lpString
+    type: LPWSTR
+    value: valid_buffer_256
+
+  - name: cbCount
+    type: INT
+    strategy: [BoundaryMax, BoundaryMin, BoundaryZero]
+
+  - name: lpDx
+    type: LPINT
+    value: "0"
+
+expect:
+  - unexpected_status
+  - status_invalid_parameter
+
