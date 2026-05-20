@@ -1,0 +1,28 @@
+name: "IAudioClient::Initialize format/period fuzzing"
+api: WASAPI
+interface: IAudioClient
+method: Initialize
+platform: "Win11 24H2"
+description: >
+  Fuzzes WAVEFORMATEXTENSIBLE and period parameters passed to
+  IAudioClient::Initialize in shared mode. Targets format validation
+  and period clamp logic in audioeng.dll.
+
+params:
+  - name: ShareMode
+    type: AUDCLNT_SHAREMODE
+    value: AUDCLNT_SHAREMODE_SHARED
+  - name: hnsBufferDuration
+    type: REFERENCE_TIME
+    strategy: [BoundaryMin, BoundaryZero, BoundaryMax, NegativeValue]
+  - name: pFormat
+    type: WAVEFORMATEX
+    strategy: [ValidBase, MutateChannels, MutateBlockAlign, MutateSampleRate,
+               MutateBitsPerSample, WFXExtensible, RandomGarbage]
+
+expect:
+  - AUDCLNT_E_UNSUPPORTED_FORMAT
+  - AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED
+  - E_INVALIDARG
+  - unexpected_hresult
+  - process_crash

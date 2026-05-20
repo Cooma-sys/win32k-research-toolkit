@@ -77,6 +77,9 @@ if(MSVC)
     )
 endif()
 
+# ── AudioDGFuzz ────────────────────────────────────────────────────────────
+add_subdirectory(AudioDGFuzz)
+
 # ── Post-build: копируем PDB рядом с EXE (удобно для WinDbg) ─────────────
 if(MSVC)
     add_custom_command(TARGET W32KSpy POST_BUILD

@@ -1,0 +1,29 @@
+name: "IAudioClient GetBuffer/ReleaseBuffer size fuzzing"
+api: WASAPI
+interface: IAudioRenderClient
+method: GetBuffer
+platform: "Win11 24H2"
+description: >
+  Requests abnormal frame counts via IAudioRenderClient::GetBuffer.
+  Mismatched GetBuffer/ReleaseBuffer frame counts can trigger
+  off-by-one in the shared endpoint ring buffer.
+
+params:
+  - name: ShareMode
+    type: AUDCLNT_SHAREMODE
+    value: AUDCLNT_SHAREMODE_SHARED
+  - name: pFormat
+    type: WAVEFORMATEX
+    strategy: [ValidBase]
+  - name: NumFramesRequested
+    type: UINT32
+    strategy: [BoundaryZero, BoundaryMax, BoundaryMin, Random]
+  - name: NumFramesReleased
+    type: UINT32
+    strategy: [BoundaryZero, BoundaryMax, BoundaryMin, Random]
+
+expect:
+  - AUDCLNT_E_BUFFER_SIZE_ERROR
+  - E_INVALIDARG
+  - unexpected_hresult
+  - process_crash
