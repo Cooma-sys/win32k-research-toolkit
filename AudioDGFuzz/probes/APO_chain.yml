@@ -1,0 +1,25 @@
+name: "APO IAudioProcessingObjectRT PCM buffer fuzzing"
+api: APO
+interface: IAudioProcessingObject
+method: APOProcess
+platform: "Win11 24H2"
+description: >
+  Directly loads a system APO and feeds malformed PCM buffers through
+  IAudioProcessingObjectRT::APOProcess. Targets signal processing
+  code without audiosrv isolation.
+
+params:
+  - name: pFormat
+    type: WAVEFORMATEX
+    strategy: [ValidBase, WFXExtensible]
+  - name: pcmBuffer
+    type: PCM_BUFFER
+    strategy: [AllZeros, AllFF, NanFloats, InfFloats, Denormals, Random,
+               BoundaryValues, WrongSize]
+
+expect:
+  - S_OK
+  - E_POINTER
+  - unexpected_hresult
+  - process_crash
+  - access_violation

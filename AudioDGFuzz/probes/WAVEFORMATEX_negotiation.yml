@@ -1,0 +1,24 @@
+name: "IAudioClient IsFormatSupported exhaustive format fuzzing"
+api: WASAPI
+interface: IAudioClient
+method: IsFormatSupported
+platform: "Win11 24H2"
+description: >
+  Exercises format negotiation path in audioeng.dll with all
+  WAVEFORMATEXTENSIBLE mutation strategies.
+
+params:
+  - name: ShareMode
+    type: AUDCLNT_SHAREMODE
+    value: AUDCLNT_SHAREMODE_SHARED
+  - name: pFormat
+    type: WAVEFORMATEX
+    strategy: [ValidBase, MutateChannels, MutateBlockAlign, MutateSampleRate,
+               MutateBitsPerSample, WFXExtensible, RandomGarbage]
+
+expect:
+  - S_OK
+  - S_FALSE
+  - AUDCLNT_E_UNSUPPORTED_FORMAT
+  - unexpected_hresult
+  - process_crash
